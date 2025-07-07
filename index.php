@@ -1,22 +1,37 @@
 <?php
 require_once("vendor/autoload.php");
 
+use Controller\UserController;
 
+$userController = new UserController();
+
+$loginMessage = '';  
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $email = $_POST['email'] ?? '';
+    $password = $_POST['password'] ?? '';
+
+    if ($userController->loginUser($email, $password)) {
+        $loginMessage = 'Logando...';
+        header('Location: View/home.php');
+        exit();
+    } else {
+        $loginMessage = 'Usuário ou senha incorretos';
+    }
+}
 ?>
-
 
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="templates/assets/css/login.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>FitCalc | Entrar na Conta</title>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="templates/assets/css/login.css" />
 </head>
 
 <body class="bgLinearGradient">
@@ -33,11 +48,13 @@ require_once("vendor/autoload.php");
     </script>
 
     <main class="d-flex justify-content-center align-items-center flex-column h-100">
-        <form method="POST" class="bg-light rounded-4">
-            <div class="form__create-account d-flex flex-column justify-content-center align-items-center">
-                <figure class="bgLinearGradient rounded-circle d-flex justify-content-center align-items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="white" class="bi bi-calculator"
-                        viewBox="0 0 16 16">
+        <form method="POST" class="bg-light rounded-4 p-4" style="min-width: 320px; max-width: 400px;">
+            <div class="form__create-account d-flex flex-column justify-content-center align-items-center mb-4">
+                <figure
+                    class="bgLinearGradient rounded-circle d-flex justify-content-center align-items-center"
+                    style="width: 80px; height: 80px; margin-bottom: 1rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="white"
+                        class="bi bi-calculator" viewBox="0 0 16 16">
                         <path
                             d="M12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
                         <path
@@ -46,10 +63,14 @@ require_once("vendor/autoload.php");
                 </figure>
 
                 <h2 class="fw-bold">Calculadora IMC</h2>
-
                 <p>Entre com suas credenciais</p>
-
             </div>
+
+            <?php if ($loginMessage): ?>
+                <div class="alert alert-danger text-center" role="alert">
+                    <?= htmlspecialchars($loginMessage) ?>
+                </div>
+            <?php endif; ?>
 
             <div class="mb-3 position-relative">
                 <label for="userEmailAddress" class="form-label">Email</label>
@@ -58,7 +79,8 @@ require_once("vendor/autoload.php");
                         <i class="bi bi-envelope"></i>
                     </span>
                     <input type="email" name="email" class="form-control border-start-0 inputPlaceholder p-2"
-                        id="userEmailAddress" placeholder="seu@email.com" aria-describedby="emailAddress" required>
+                        id="userEmailAddress" placeholder="seu@email.com" aria-describedby="emailAddress" required
+                        value="<?= isset($email) ? htmlspecialchars($email) : '' ?>">
                 </div>
             </div>
 
@@ -76,10 +98,9 @@ require_once("vendor/autoload.php");
             <button type="submit" class="bgLinearGradient rounded-3 w-100 mb-4">Entrar</button>
 
             <p class="text-center">Não tem uma conta? <a href="View/register.php">Cadastre-se aqui</a></p>
-            </div>
         </form>
 
-        <p></p>
+        <p> <?php echo $loginMessage; ?></p>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"

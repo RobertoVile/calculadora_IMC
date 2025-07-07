@@ -2,8 +2,27 @@
 session_start();
 require_once'../vendor/autoload.php';
 
-use Model\Imcs;
-$imc = new Imcs();
+
+use Controller\ImcsController;
+use Controller\UserController;
+
+
+$imcCont = new ImcsController();
+$userController = new UserController();
+
+$imcResult = null;
+$userResult = null;
+
+$user_id = $_SESSION['id'];
+$user_fullname = $_SESSION['user_fullname'];
+$email = $_SESSION['email'];
+
+$userResult = $userController ->getUser($user_id,$user_fullname,$email);
+
+if(!$userController->isLoggedIn()){
+    header('Location:../index.php');
+    exit();
+}
 
 if($_SERVER['REQUEST_METHOD'] == "POST") {
     if(isset($_POST["weight"],$_POST['height'])){
@@ -126,7 +145,9 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 
                 <div class="result">
                     <div class="result__info">
-                        <!-- RESULTADO DO CALCULO -->
+                      <php if ($imcResult):?>
+                        <p></p>
+                      </php>
                     </div>
                 </div>
             </div>

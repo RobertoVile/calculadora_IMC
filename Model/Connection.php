@@ -5,22 +5,27 @@ namespace Model;
 use PDO;
 use PDOException;
 
+require_once __DIR__ . "/../config/Configuration.php";
 
-require_once __DIR__."/../config/Configuration.php";
-class Connection{
-    private static $smt;
+class Connection
+{
+    private static $stmt;
 
-    public static function getIntance():PDO{  
-        if(empty(self::$smt)){
-        try{
-            self::$stmt = new PDO('mysql:host='. DB_HOST. ';port='.  DB_PORT. ';dbname=' .DB_NAME . '', DB_USER , DB_PASSWORD); 
-        } catch(PDOException $e){
-            echo $e->getMessage('falhou');
-            die($e->getMessage('falhou'));
-
+    public static function getInstance(): PDO
+    {
+        if (empty(self::$stmt)) {
+            try {
+                self::$stmt = new PDO(
+                    'mysql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME,
+                    DB_USER,
+                    DB_PASSWORD
+                );
+                self::$stmt->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            } catch (PDOException $e) {
+                die("Erro na conexão: " . $e->getMessage());
+            }
         }
+        return self::$stmt;
     }
-    return self::$stmt;
-}
 }
 ?>
